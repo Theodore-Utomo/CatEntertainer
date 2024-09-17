@@ -4,11 +4,9 @@ struct ContentView: View {
     @State private var positionX = 0.0
     @State private var positionY = 0.0
     @State private var isMoving = false
-    @State private var timer: Timer? = nil
-    @State private var speedOfIcon = 1.0
-    
-    // Track the angle of the fish based on movement direction
-    @State private var iconAngle: Double = 0.0
+    @State private var timer: Timer? = nil //Timer for moving fish around screen
+    @State private var speedOfIcon = 1.0 //Used to calculate speed
+    @State private var iconAngle: Double = 0.0 //Used to calculate angle and rotate icon
     
     var body: some View {
         GeometryReader { geometry in
@@ -75,21 +73,20 @@ struct ContentView: View {
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
             withAnimation(.easeInOut(duration: 2.0 / speedOfIcon)) {
-                // Ensure the fish moves within the screen bounds
                 let lowerLimitWidth = -size.width / 2 + 50
                 let upperLimitWidth = size.width / 2 - 50
                 let lowerLimitHeight = -size.height / 2 + 150
                 let upperLimitHeight = size.height / 2 - 150
+                //Limits bounds to within screen
                 
                 let newPositionX = Double.random(in: lowerLimitWidth...upperLimitWidth)
-                let newPositionY = Double.random(in: lowerLimitHeight...upperLimitHeight)
-                
-                // Calculate angle based on the difference between new and current positions
+                let newPositionY = Double.random(in: lowerLimitHeight...upperLimitHeight) //Randomize movement
+                //Calculates angle from change in position
                 let deltaX = newPositionX - positionX
                 let deltaY = newPositionY - positionY
+                //Updates Icon Angle
                 iconAngle = calculateAngle(deltaX: deltaX, deltaY: deltaY)
-                
-                // Update the fish position after calculating the angle
+                //Updates Icon Position
                 positionX = newPositionX
                 positionY = newPositionY
             }
@@ -98,13 +95,12 @@ struct ContentView: View {
     
     func stopMoving() {
         isMoving = false
-        timer?.invalidate() // Stop the timer
+        timer?.invalidate()
         timer = nil
     }
     
-    // Function to calculate the angle based on movement direction
     func calculateAngle(deltaX: Double, deltaY: Double) -> Double {
-        let angle = atan2(deltaY, deltaX) // Calculate angle in radians
+        let angle = atan2(deltaY, deltaX)
         return angle * 180 / .pi  // Convert to degrees
     }
 }
