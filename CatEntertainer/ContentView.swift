@@ -16,7 +16,7 @@ struct ContentView: View {
         GeometryReader { geometry in
             VStack {
                 PhotosPicker(selection: $selectedPhoto, matching: .images, preferredItemEncoding: .automatic) {
-                    Label("Photo Library", systemImage: "photo.fill.on.rectangle.fill")
+                    Label("Change Icon", systemImage: "photo.fill.on.rectangle.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
