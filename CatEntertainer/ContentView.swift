@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct ContentView: View {
     @State private var positionX = 0.0
@@ -7,21 +8,48 @@ struct ContentView: View {
     @State private var timer: Timer? = nil //Timer for moving fish around screen
     @State private var speedOfIcon = 1.0 //Used to calculate speed
     @State private var iconAngle: Double = 0.0 //Used to calculate angle and rotate icon
+    @State private var movingIcon = Image(systemName: "tennisball.fill")
+    @State private var selectedPhoto: PhotosPickerItem?
+
     
     var body: some View {
         GeometryReader { geometry in
             VStack {
+                PhotosPicker(selection: $selectedPhoto, matching: .images, preferredItemEncoding: .automatic) {
+                    Label("Photo Library", systemImage: "photo.fill.on.rectangle.fill")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.indigo)
+                .onChange(of: selectedPhoto) {
+                    // Get data from PhotosPickerItem selectedPhoto
+                    // use data to create UIimage
+                    // use UIImage to create an Image
+                    // assign that image to bipImage
+                    Task {
+                        do {
+                            if let data = try await selectedPhoto?.loadTransferable(type: Data.self) { //loads raw data into the data variable
+                                if let uiImage = UIImage(data: data) { // converts the data into a UIImage type
+                                    movingIcon = Image(uiImage: uiImage) // Use UI image to convert it into an image
+                                }
+                            }
+                        } catch {
+                            print("😡 Error: loading failed \(error.localizedDescription)")
+                        }
+                    }
+                }
                 Spacer()
                 
-                Image(systemName: "tennisball.fill")
+                movingIcon
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .frame(width: 100, height: 100)
+                    .clipShape(Circle())
                     .foregroundStyle(.indigo)
                     .offset(x: positionX, y: positionY)
                     .rotationEffect(Angle(degrees: iconAngle))  // Rotate the fish based on the calculated angle
                     .animation(.easeInOut(duration: 2.0 / speedOfIcon), value: positionX)
                     .animation(.easeInOut(duration: 2.0 / speedOfIcon), value: positionY)
+                
                 
                 Spacer()
                 
